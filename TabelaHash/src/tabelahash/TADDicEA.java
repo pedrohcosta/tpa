@@ -5,37 +5,28 @@
  */
 package tabelahash;
 
+import java.util.LinkedList;
+
 /**
  * @author PedroBook
  */
-public class TADDicEA {
-
-    private static ItemTabHash NO_SUCH_KEY = new ItemTabHash(null, null);
-    private HashEngine hashEngine;
+public class TADDicEA extends TADDic {
 
     private ItemTabHash[] vetBuckets;
-    private int tam;
-    private int tamVetBuckets;
-    
+
     public TADDicEA(int tamanho, HashEngine hashEngine) {
-        this.tamVetBuckets = tamanho;
+        super(tamanho, hashEngine);
         vetBuckets = new ItemTabHash[this.tamVetBuckets];
-        this.hashEngine = hashEngine;
-        tam = 0;
     }
 
     public TADDicEA() {
-        this.tamVetBuckets = 64;
+        super();
         vetBuckets = new ItemTabHash[this.tamVetBuckets];
-        this.hashEngine = new HashEngine();
-        tam = 0;
     }
-    
+
     public TADDicEA(HashEngine hashEngine) {
-        this.tamVetBuckets = 64;
+        super(hashEngine);
         vetBuckets = new ItemTabHash[this.tamVetBuckets];
-        this.hashEngine = hashEngine;
-        tam = 0;
     }
 
     public Object findElement(Object k) {
@@ -57,9 +48,11 @@ public class TADDicEA {
         return NO_SUCH_KEY;
     }
 
-    public Object insertItem(Object k, Object o) {
+    public boolean insertItem(Object k, Object o) {
         int i = hashEngine.h(k, this.tamVetBuckets);
         int p = 0;
+
+        redimensionar();
 
         do {
             ItemTabHash c = vetBuckets[i];
@@ -79,6 +72,7 @@ public class TADDicEA {
         return false;
     }
 
+    //retornar objecto ou chave não encontrada
     public Object removeElement(Object k) {
         int i = hashEngine.h(k, this.tamVetBuckets);
         int p = 0;
@@ -88,49 +82,37 @@ public class TADDicEA {
             if (c.getKey() == k) {
                 vetBuckets[i] = null;
                 this.tam--;
-                return true;
+                return c.getElement();
             } else {
                 i = (i + 1) % tamVetBuckets;
                 p += 1;
             }
         } while (p != tamVetBuckets);
-        return false;
+        return NO_SUCH_KEY;
     }
 
-    public int size() {
-        return tam;
-    }
-
-    public boolean isEmpty() {
-        return (tam < 1);
-    }
-
-    public Object[] keys() {
-        Object[] vet = new Object[this.tam];
-        int i = 0;
+    public LinkedList<Object> keys() {
+        LinkedList vet = new LinkedList();
         for (ItemTabHash vetBucket : this.vetBuckets) {
             if (vetBucket != null) {
-                vet[i] = vetBucket.getKey();
-                i++;
+                vet.add(vetBucket.getKey());
             }
         }
 
         return vet;
     }
 
-    public Object[] elements() {
-        Object[] vet = new Object[this.tam];
-        int i = 0;
+    public LinkedList<Object> elements() {
+        LinkedList vet = new LinkedList();
         for (ItemTabHash vetBucket : this.vetBuckets) {
             if (vetBucket != null) {
-                vet[i] = vetBucket.getElement();
-                i++;
+                vet.add(vetBucket.getElement());
             }
         }
         return vet;
     }
 
-    private void redimensionar() {
+    public void redimensionar() {
         double v = this.tamVetBuckets * 0.8;
 
         if (this.tam >= v) {
@@ -143,12 +125,15 @@ public class TADDicEA {
 
             this.tamVetBuckets += 100;
             this.vetBuckets = new ItemTabHash[this.tamVetBuckets];
-            
+            this.tam = 0;
+
             //recalcula os hash
             for (ItemTabHash itemTabHash : vetBucketsAux) {
-                insertItem(itemTabHash.getKey(), itemTabHash.getElement());
+                if (itemTabHash != null) {
+                    insertItem(itemTabHash.getKey(), itemTabHash.getElement());
+                }
             }
-            
+
         }
 
     }

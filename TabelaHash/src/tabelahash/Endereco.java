@@ -10,18 +10,17 @@ package tabelahash;
  * @author PedroBook
  */
 public class Endereco {
+
     private String cep;
     private String endereco;
     private String bairro;
     private String cidade;
-    private String UF;
 
-    public Endereco(String cep, String endereco, String bairro, String cidade, String UF) {
+    public Endereco(String cep, String endereco, String bairro, String cidade) {
         this.cep = cep;
         this.endereco = endereco;
         this.bairro = bairro;
         this.cidade = cidade;
-        this.UF = UF;
     }
 
     public String getCep() {
@@ -40,8 +39,4 @@ public class Endereco {
         return cidade;
     }
 
-    public String getUF() {
-        return UF;
-    }
-    
 }
